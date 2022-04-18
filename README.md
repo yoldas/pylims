@@ -19,7 +19,7 @@ Install coverage.
 
 Download pylims.
 
-    git clone yoldas/pylims
+    git clone https://github.com/yoldas/pylims.git
 
 Go to the directory of lims.py and run the script without any arguments to view 
 the usage help.

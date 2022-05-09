@@ -10,12 +10,14 @@ class Sample:
     name_delimiter = '-'  # between customer and sample name used by customer
     tag_re = re.compile('^[ATGC]+$')  # DNA regex
 
-    def __init__(self, customer=None, name=None, sample_id=None, tag=None):
+    def __init__(self, customer=None, name=None, sample_id=None, tag=None,
+                 concentration=None):
         """Initialises a Sample using sample attributes."""
         self._customer = customer
         self._name = name
         self._sample_id = sample_id
         self._tag = tag
+        self._concentration = concentration
 
     def __str__(self):
         """Returns string representation of the Sample."""
@@ -24,6 +26,9 @@ class Sample:
         tag = self.get_tag()
         if tag:
             lines.append('Tag: %s' % tag)
+        value = self.get_concentration()
+        if value is not None:
+            lines.append('Concentration: %s' % value)
         return ', '.join(lines)
 
     def get_customer(self):
@@ -68,6 +73,18 @@ class Sample:
         return False
 
     @classmethod
+    def validate_concentration(cls, value):
+        """Returns True if concentration value is acceptable."""
+        try:
+            value = int(value)
+        except ValueError:
+            return False
+        if 50 <= value <= 200:
+            return True
+        return False
+
+
+    @classmethod
     def validate_customer_sample_name_format(cls, name):
         """Returns True of the format of customer sample name is valid.
         The name must be composed of customer and sample name used by customer
@@ -82,6 +99,12 @@ class Sample:
     def split_customer_sample_name(cls, name):
         """Splits name into customer and sample name used by customer."""
         return name.split('-', 1)
+
+    def get_concentration(self):
+        return self._concentration
+
+    def set_concentration(self, value):
+        self._concentration = value
 
 
 class Container:

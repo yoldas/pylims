@@ -168,6 +168,13 @@ ${sample}
 TAGGED_SAMPLE_TEMP = """Tagged sample successfully
 ${sample}
 """
+UPDATED_SAMPLE_CONCENTRATION_TEMP = """Updated sample concentration successfully
+${sample}
+"""
+INVALID_SAMPLE_CONCENTRATION_TEMP = """Invalid concentration value: {value}
+The value must be between 50 and 200 inclusive.
+"""
+
 FOUND_DISCARDED_SAMPLE_TUBE_TEMP = """Found discarded sample tube
 ${result}
 """
@@ -214,6 +221,7 @@ class Shell:
         'tube_transfer': ('source_tube_barcode', 'destination_tube_barcode'),
         'list_samples_in': ('container_barcode',),
         'tag': ('sample_id', 'tag'),
+        'update_concentration': ('sample_id', 'concentration')
     }
 
     def start_process(self):
@@ -270,7 +278,7 @@ class Shell:
         """Returns exit code for OS by checking the start of status."""
         magic = status.upper().startswith
         if (magic('FOUND') or magic('RECORDED') or magic('ADDED') or
-                magic('MOVED') or magic('TAGGED')):
+                magic('MOVED') or magic('TAGGED') or magic('UPDATED')):
             return self.EXIT_SUCCESS
         else:
             return self.EXIT_FAILURE

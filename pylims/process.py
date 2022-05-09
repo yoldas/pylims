@@ -35,6 +35,10 @@ class Methods:
         """Applies a tag to a Sample."""
         raise NotImplementedError("Method not implemented.")
 
+    def update_concentration(self, sample_id, value):
+        """Set concentrationon the Sample."""
+        raise NotImplementedError("Method not implemented.")
+
 
 class Response:
     """Result of Methods."""
@@ -75,6 +79,8 @@ class Response:
     FOUND_PLATE = 'Found plate' # OK
     PLATE_NOT_FOUND = 'Plate not found'
     INVALID_BARCODE_PREFIX = 'Invalid barcode prefix'
+    UPDATED_SAMPLE_CONCENTRATION = 'Updated sample concentration'
+    INVALID_SAMPLE_CONCENTRATION = 'Invalid concentration value'
 
     def __init__(self, status, data=None):
         """Initialises Response with status and data."""
@@ -354,3 +360,23 @@ class Process(Methods):
             return Response(Response.UNEXPECTED_ERROR, data)
         self._dataset.commit_transaction()
         return Response(Response.TAGGED_SAMPLE, data)
+
+    def update_concentration(self, sample_id, value):
+        data = dict(sample_id=sample_id, concentration=value)
+        if not Sample.validate_concentration(value):
+            return Response(Response.INVALID_SAMPLE_CONCENTRATION, data)
+
+        sample = self._dataset.find_sample_by_sample_id(sample_id)
+        if not sample:
+            return Response(Response.SAMPLE_NOT_FOUND, data)
+
+        try:
+            self._dataset.update_sample_concentration(sample, value)
+        except Exception:
+            self._dataset.rollback_transaction()
+            LOG.exception("tag(%s, '%s')", sample_id, value)
+            return Response(Response.UNEXPECTED_ERROR, data)
+        self._dataset.commit_transaction()
+
+        data['sample'] = sample
+        return Response(Response.UPDATED_SAMPLE_CONCENTRATION, data)

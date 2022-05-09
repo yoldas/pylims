@@ -12,12 +12,14 @@ class LabTest(unittest.TestCase):
         name = 'sample1'
         sample_id = 1
         tag = 'CAT'
-        sample = Sample(customer, name, sample_id, tag)
+        concentration = 50  # 50 <= x <=200
+        sample = Sample(customer, name, sample_id, tag, concentration)
 
         self.assertEqual(customer, sample.get_customer())
         self.assertEqual(name, sample.get_name())
         self.assertEqual(sample_id, sample.get_sample_id())
         self.assertEqual(tag, sample.get_tag())
+        self.assertEqual(concentration, sample.get_concentration())
 
     def test_customer_sample_name(self):
         sample = Sample()
@@ -58,6 +60,25 @@ class LabTest(unittest.TestCase):
 
         tag = 'ATGC '  # following space
         self.assertFalse(Sample.validate_tag_format(tag))
+
+    def test_validate_concentration(self):
+        value = 0
+        self.assertFalse(Sample.validate_concentration(value))
+
+        value = 50
+        self.assertTrue(Sample.validate_concentration(value))
+
+        value = 200
+        self.assertTrue(Sample.validate_concentration(value))
+
+        value = -1
+        self.assertFalse(Sample.validate_concentration(value))
+
+        value = 201
+        self.assertFalse(Sample.validate_concentration(value))
+
+        value = 'NOT A NUMBER'
+        self.assertFalse(Sample.validate_concentration(value))
 
     def test_sample_validate_customer_sample_name_format(self):
         name = 'customer1' + Sample.name_delimiter + ' sample1'  # complete
@@ -257,6 +278,8 @@ class LabTest(unittest.TestCase):
         label = 'B1'
         self.assertTrue(plate.well_is_empty(label))
 
+
+
     def test_validate_well_label_format(self):
         label = 'A1'
         self.assertTrue(Plate.validate_well_label_format(label))
@@ -414,5 +437,3 @@ class LabTest(unittest.TestCase):
                 plate.add_well(well)
 
         self.assertTrue(plate.is_full())
-
-

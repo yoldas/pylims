@@ -4,6 +4,7 @@ create table sample (
     name text not null, -- sample name customer uses
     sample_id integer primary key autoincrement, --unique across all samples
     tag text, -- tag appended default null
+    concentration integer,
     unique(customer, name)  -- name is unique across samples from customer
 );
 

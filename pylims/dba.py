@@ -320,6 +320,17 @@ class SQLite3DataSource(DataSource):
             cursor.close()
         sample.set_tag(tag)
 
+    def update_sample_concentration(self, sample, value):
+        """Updates tag of sample."""
+        sql = "update sample set concentration = ? where sample_id = ?"
+        params = value, sample.get_sample_id()
+        cursor = self._conn.cursor()
+        try:
+            cursor.execute(sql, params)
+        finally:
+            cursor.close()
+        sample.set_concentration(value)
+
     def create_plate(self, plate):
         """Creates a Plate and its wells."""
         sql = "insert into plate (barcode, grid) values (?, ?)"
